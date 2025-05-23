@@ -7,6 +7,7 @@ from sklearn.linear_model import Lasso
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import VarianceThreshold
 import argparse
 
 
@@ -22,13 +23,14 @@ y = pd.read_csv("../data/Biobank_SSI/outcome.csv")['model1b']
 
 preproc = Pipeline([
     ('imputer', SimpleImputer(strategy='median')),
+    ('var_thresh', VarianceThreshold(0.0000000001)),
     ('scaler', StandardScaler())
 ])
 X_proc = preproc.fit_transform(X)
 
 
 
-artificial_type = "random_permutation"  #or "knockoff"
+artificial_type = "knockoff"  #or "knockoff" random_permutation
 
 def run(i): 
     random = i
@@ -47,7 +49,8 @@ def run(i):
         sample_fraction=0.5,
         random_state=random,
         lambda_grid={"alpha": np.logspace(-2, 2, 10)},  # Grid log pour alpha #previous -4 -> 1 #when I did logspace from -4 to +1 it took 6 min/seed so i started again from the beginning and now it's 1min30/seed.
-        verbose=1  
+        verbose=1, 
+        repetition=2
     )
 
     
@@ -55,9 +58,11 @@ def run(i):
 
    
     os.makedirs(f"./{path}/{random}", exist_ok=True)
+    mask = preproc.named_steps['var_thresh'].get_support() # since there's a variance thershold we need to filter the columns that have been deleted by the threshold
+    filtered_feature_names = np.array(original_feature_names)[mask] #
 
     # extracting the useful files. I copy pasted the main function from stabl.py file
-    selected_features = stabl.get_feature_names_out(input_features=original_feature_names)
+    selected_features = stabl.get_feature_names_out(input_features=filtered_feature_names)
     pd.DataFrame({
         "Features": selected_features,
         "Max_Stability_Score": stabl.stabl_scores_.max(axis=1)[stabl.get_support()]
