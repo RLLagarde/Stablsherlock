@@ -55,7 +55,7 @@ def run(i):
         random_state=random,
         lambda_grid={"C": np.logspace(-2, 2, 10)},  # Grid log pour alpha #previous -4 -> 1 #when I did logspace from -4 to +1 it took 6 min/seed so i started again from the beginning and now it's 1min30/seed.
         verbose=1, 
-        repetition=20
+        repetition=50
     )
 
     
