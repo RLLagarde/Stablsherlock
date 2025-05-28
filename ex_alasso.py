@@ -48,9 +48,7 @@ for i in range(28, 50):
         random_state=random,
         lambda_grid={"C": np.logspace(-2, 2, 10)},  # Grid log pour alpha #previous -4 -> 1
         verbose=1,
-        repetition=50,
-        selection_mode= "fdr",
-        quantile_q = 0.10
+        repetition=50
 
     )
 
