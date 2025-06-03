@@ -1019,8 +1019,9 @@ def multi_omic_stabl(
         print(f"This fold: {len(selected_features_dict[model])} features selected for {model}")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
+     
     for model in predictions_dict.keys():
-        predictions_dict[model].fillna(0.5, inplace=True) 
+        predictions_dict[model].fillna(0.5, inplace=True) #adding this for dataset with few samples so that we don't have NaN predictions in case cv would produce a batch with only 0 or 1 value
 
     if X_test is not None:
         table_of_scores = compute_scores_table(
